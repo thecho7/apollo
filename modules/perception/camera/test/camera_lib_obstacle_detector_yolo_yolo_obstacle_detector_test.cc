@@ -31,7 +31,7 @@ TEST(YoloCameraDetectorTest, demo_test) {
   inference::CudaUtil::set_device_id(0);
   cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/detector/yolo/img/test.jpg");
-  CHECK(!cv_img.empty()) << "image is empty.";
+  CHECK(!cv_img.empty()) << "image is empty."; // 테스트 이미지 불러오기
 
   base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
 
@@ -39,14 +39,14 @@ TEST(YoloCameraDetectorTest, demo_test) {
     memcpy(image.mutable_cpu_ptr(y), cv_img.ptr<uint8_t>(y),
            image.width_step());
   }
-  CameraFrame frame;
-  DataProvider data_provider;
-  frame.data_provider = &data_provider;
+  CameraFrame frame; // 현재 프레임
+  DataProvider data_provider; // 데이터 불러오기 위한 객체
+  frame.data_provider = &data_provider; // 현재 프레임에 정보 입히기
   if (frame.track_feature_blob == nullptr) {
     frame.track_feature_blob.reset(new base::Blob<float>());
   }
-  DataProvider::InitOptions dp_init_options;
-  dp_init_options.sensor_name = "onsemi_obstacle";
+  DataProvider::InitOptions dp_init_options; // 초기화 시키고
+  dp_init_options.sensor_name = "onsemi_obstacle"; // onsemi obstacle?
 
   dp_init_options.image_height = cv_img.rows;
   dp_init_options.image_width = cv_img.cols;
@@ -71,10 +71,10 @@ TEST(YoloCameraDetectorTest, demo_test) {
   BaseObstacleDetector *detector =
       BaseObstacleDetectorRegisterer::GetInstanceByName("YoloObstacleDetector");
   CHECK_EQ(detector->Name(), "YoloObstacleDetector");
-  EXPECT_TRUE(detector->Init(init_options));
+  EXPECT_TRUE(detector->Init(init_options)); // 온갖 Parameter를 불러옴 (모델, 파라미터, Velodyne에 대한 카메라 파라미터 등)
 
   ObstacleDetectorOptions options;
-  EXPECT_TRUE(detector->Detect(options, &frame));
+  EXPECT_TRUE(detector->Detect(options, &frame)); // detector->Detect 가 frame에 대해 YOLO 알고리즘 수행하고 그 결과를 detected_objects에 넣음
   EXPECT_FALSE(detector->Detect(options, nullptr));
 
   // EXPECT_EQ(frame.detected_objects.size(), 8);
